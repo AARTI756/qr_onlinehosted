@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Generate QR{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 500px;">
+    <h3 class="mb-3 text-center">Generate QR</h3>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="data" class="form-label">Text or URL</label>
+            <input type="text" class="form-control" id="data" name="data" placeholder="Enter text or URL" required>
+        </div>
+        <div class="mb-3">
+            <label for="expiry" class="form-label">Expiry (minutes)</label>
+            <input type="number" class="form-control" id="expiry" name="expiry" value="5" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Generate</button>
+    </form>
+</div>
+{% endblock %}

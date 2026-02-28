@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2>Scan Result</h2>
+    <div class="alert alert-info mt-3">
+        {{ data }}
+    </div>
+    <a href="/scan_camera" class="btn btn-primary mt-3">Scan Again</a>
+</div>
+{% endblock %}

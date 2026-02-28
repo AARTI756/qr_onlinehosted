@@ -1,0 +1,129 @@
+/* ---------------- Global ---------------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+h3 {
+    color: #0d6efd; /* Bootstrap primary blue */
+}
+
+/* ---------------- Navbar ---------------- */
+.navbar {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    color: #ffc107 !important; /* Highlight on hover */
+}
+
+/* ---------------- Cards ---------------- */
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* ---------------- Buttons ---------------- */
+.btn-primary {
+    background: linear-gradient(135deg, #4e9af1, #1b60d2);
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1b60d2, #4e9af1);
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.6rem;
+}
+
+/* ---------------- Tables ---------------- */
+.table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #0d6efd;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+/* ---------------- Alerts ---------------- */
+.alert-success {
+    background-color: #e6f4ea;
+    color: #1f7a4d;
+    border: none;
+    font-weight: 500;
+}
+
+/* ---------------- Forms ---------------- */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+}
+
+/* ---------------- Footer ---------------- */
+footer {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+/* ---------------- Camera Feed ---------------- */
+#camera_feed {
+    border-radius: 12px;
+    border: 2px solid #0d6efd;
+    max-height: 500px;
+}
+
+/* ---------------- QR Result ---------------- */
+#qr_result img {
+    border: 4px solid #0d6efd;
+    border-radius: 12px;
+    padding: 5px;
+    background-color: #fff;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+    .card {
+        padding: 1.5rem;
+    }
+
+    #camera_feed {
+        max-height: 300px;
+    }
+}

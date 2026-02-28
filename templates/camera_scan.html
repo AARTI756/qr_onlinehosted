@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container text-center mt-4">
+    <h3>Scan QR Code</h3>
+    <p>Point your camera at the QR code. It will automatically detect and redirect if it’s a URL.</p>
+    
+    <!-- Live video feed -->
+    <img id="camera-feed" src="{{ url_for('camera_feed') }}" style="max-width: 100%; border: 2px solid #333;">
+
+</div>
+
+<script>
+    // Poll the server to check if QR was detected
+    const checkQR = async () => {
+        const response = await fetch("/camera_feed");
+        const reader = response.body.getReader();
+        let result = await reader.read();
+        if (!result.done) {
+            const textDecoder = new TextDecoder();
+            const chunkText = textDecoder.decode(result.value);
+            // QR detected if contains boundary
+            if (chunkText.includes("Content-Type: image/jpeg")) {
+                // Reload to redirect on server
+                window.location.reload();
+            }
+        }
+    };
+
+    setInterval(checkQR, 10000);
+</script>
+
+{% endblock %}

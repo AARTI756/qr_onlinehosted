@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Scan QR{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 500px;">
+    <h3 class="mb-3 text-center">Scan QR (Upload Image)</h3>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <input type="file" class="form-control" name="qr_image" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Scan</button>
+    </form>
+    {% if result %}
+    <div class="alert alert-success mt-3">{{ result }}</div>
+    {% endif %}
+</div>
+{% endblock %}

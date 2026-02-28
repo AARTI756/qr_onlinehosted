@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}QR Generated{% endblock %}
+{% block content %}
+<div class="card p-4 text-center mx-auto" style="max-width: 500px;">
+    <h3 class="mb-3">QR Code Generated</h3>
+    <img src="{{ url_for('static', filename=qr_image.split('/')[-1]) }}" class="img-fluid mb-3" alt="QR Code">
+    {% if data %}
+    <p class="text-muted">Data: {{ data }}</p>
+    {% endif %}
+    <a href="/generate" class="btn btn-primary w-100">Generate Another</a>
+</div>
+{% endblock %}
