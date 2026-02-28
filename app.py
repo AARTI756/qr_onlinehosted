@@ -2,10 +2,8 @@ from flask import Flask, request, render_template, session, redirect, Response
 from flask_sqlalchemy import SQLAlchemy
 from config import SECRET_KEY
 from modules.db_config import DB_PATH
-from database.init_db import init_db
 from modules.encryption import decrypt_data
 from modules.auth import auth_routes
-from modules.qr_scanner import scan_qr_from_camera
 import sqlite3
 import uuid
 import qrcode
@@ -18,7 +16,6 @@ from PIL import Image
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-init_db()   # create tables on startup
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -26,7 +23,17 @@ db = SQLAlchemy(app)
 
 app.register_blueprint(auth_routes)
 
+app = Flask(__name__)
+app.secret_key = SECRET_KEY
 
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+with app.app_context():
+    db.create_all()
+    
 class QR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qr_id = db.Column(db.String(100), unique=True, nullable=False)
@@ -125,5 +132,3 @@ def scan_result():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-with app.app_context():
-    db.create_all()
