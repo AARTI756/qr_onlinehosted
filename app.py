@@ -1,17 +1,12 @@
-from flask import Flask, request, render_template, session, redirect, Response
+from flask import Flask, request, render_template, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 from config import SECRET_KEY
-from modules.db_config import DB_PATH
-from modules.encryption import decrypt_data
 from modules.auth import auth_routes
-import sqlite3
 import uuid
 import qrcode
 import os
 from datetime import datetime, timedelta
 from pytz import timezone
-from PIL import Image
-
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -23,17 +18,13 @@ db = SQLAlchemy(app)
 
 app.register_blueprint(auth_routes)
 
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# ✅ Home route (fixes Not Found issue)
+@app.route("/")
+def home():
+    return redirect("/generate")
 
-db = SQLAlchemy(app)
 
-with app.app_context():
-    db.create_all()
-    
 class QR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qr_id = db.Column(db.String(100), unique=True, nullable=False)
@@ -42,6 +33,9 @@ class QR(db.Model):
     expiry = db.Column(db.DateTime)
     owner_id = db.Column(db.Integer)
 
+
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/generate", methods=["GET", "POST"])
@@ -53,7 +47,6 @@ def generate():
         qr_id = str(uuid.uuid4())
         expiry_time = datetime.utcnow() + timedelta(minutes=expiry_minutes)
 
-        # Check if data is URL
         is_url = (
             data.startswith("http://")
             or data.startswith("https://")
@@ -61,10 +54,9 @@ def generate():
         )
 
         if is_url:
-            # Add https if missing
             if not data.startswith("http"):
                 data = "https://" + data
-            qr_content = data  # Direct URL
+            qr_content = data
         else:
             base_url = request.host_url
             qr_content = f"{base_url}verify/{qr_id}"
@@ -80,8 +72,10 @@ def generate():
             db.session.commit()
 
         img = qrcode.make(qr_content)
+
         if not os.path.exists("static"):
             os.makedirs("static")
+
         img_path = f"static/{qr_id}.png"
         img.save(img_path)
 
@@ -90,26 +84,33 @@ def generate():
     return render_template("generate.html")
 
 
-
-
 @app.route("/history")
 def history():
     records = QR.query.all()
     ist = timezone("Asia/Kolkata")
-    current_time_ist = datetime.utcnow().replace(tzinfo=timezone("UTC")).astimezone(ist)
-    # convert created_at and expiry to IST for display
+
+    current_time_ist = datetime.utcnow().replace(
+        tzinfo=timezone("UTC")
+    ).astimezone(ist)
+
     for r in records:
-        r.created_at_ist = r.created_at.replace(tzinfo=timezone("UTC")).astimezone(ist)
-        r.expiry_ist = r.expiry.replace(tzinfo=timezone("UTC")).astimezone(ist)
+        r.created_at_ist = r.created_at.replace(
+            tzinfo=timezone("UTC")
+        ).astimezone(ist)
+
+        r.expiry_ist = r.expiry.replace(
+            tzinfo=timezone("UTC")
+        ).astimezone(ist)
+
     return render_template(
         "history.html",
         records=records,
         current_time=current_time_ist
     )
 
+
 @app.route("/verify/<qr_id>")
 def verify_qr(qr_id):
-
     qr = QR.query.filter_by(qr_id=qr_id).first()
 
     if not qr:
@@ -125,10 +126,12 @@ def verify_qr(qr_id):
 def scan_camera():
     return render_template("scan_camera.html")
 
+
 @app.route("/scan_result")
 def scan_result():
     data = request.args.get("data")
     return render_template("scan_result.html", data=data)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
