@@ -12,9 +12,7 @@ import qrcode
 import os
 from datetime import datetime, timedelta
 from pytz import timezone
-from pyzbar.pyzbar import decode
 from PIL import Image
-import cv2
 
 
 app = Flask(__name__)
@@ -85,19 +83,6 @@ def generate():
     return render_template("generate.html")
 
 
-@app.route('/camera_feed')
-def camera_feed():
-    def generate():
-        cap = cv2.VideoCapture(0)
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            _, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route("/history")
@@ -128,36 +113,6 @@ def verify_qr(qr_id):
 
     return render_template("valid.html", data=qr.data)
 
-@app.route("/scan", methods=["GET", "POST"])
-def scan_qr():
-    if request.method == "POST":
-        file = request.files["qr_image"]
-        image = Image.open(file)
-
-        decoded_objects = decode(image)
-
-        if not decoded_objects:
-            return render_template("scan.html", result="No QR detected")
-
-        qr_content = decoded_objects[0].data.decode("utf-8")
-
-        # If it's a verification URL
-        if "/verify/" in qr_content:
-            qr_id = qr_content.split("/verify/")[-1]
-
-            qr = QR.query.filter_by(qr_id=qr_id).first()
-            if not qr:
-                return render_template("scan.html", result="Invalid QR")
-
-            if datetime.utcnow() > qr.expiry:
-                return render_template("scan.html", result="QR Expired")
-
-            return render_template("scan.html", result=qr.data)
-
-        # Otherwise normal QR (text or url)
-        return render_template("scan.html", result=qr_content)
-
-    return render_template("scan.html")
 
 @app.route("/scan_camera")
 def scan_camera():
