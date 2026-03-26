@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}QR Scan Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <h3 class="mb-4">QR Scan Details</h3>
+
+    <div class="card p-3 mb-4">
+        <strong>QR Token:</strong> {{ qr.token }} <br>
+        <strong>Data:</strong> {{ qr.data }}
+    </div>
+
+    {% if logs %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Scanned Time</th>
+                <th>Location</th>
+                <th>IP Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ log.scanned_at_ist }}</td>
+                <td>{{ log.location }}</td>
+                <td>{{ log.ip_address }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No scans yet.</p>
+    {% endif %}
+
+    <a href="/history" class="btn btn-secondary mt-3">⬅ Back</a>
+
+</div>
+{% endblock %}

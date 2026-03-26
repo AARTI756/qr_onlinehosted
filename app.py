@@ -1,7 +1,10 @@
-from flask import Flask, request, render_template, session, redirect
+from flask import Flask, request, render_template, session, redirect, send_file
+import requests
 from flask_sqlalchemy import SQLAlchemy
 from config import SECRET_KEY
 from modules.auth import auth_routes
+
+import bcrypt
 import uuid
 import qrcode
 import os
@@ -18,75 +21,127 @@ db = SQLAlchemy(app)
 
 app.register_blueprint(auth_routes)
 
-
-# ✅ Home route (fixes Not Found issue)
+# ----------------------------
+# HOME
+# ----------------------------
 @app.route("/")
 def home():
     return redirect("/generate")
 
 
+# ----------------------------
+# MODELS
+# ----------------------------
 class QR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    qr_id = db.Column(db.String(100), unique=True, nullable=False)
+
+    token = db.Column(db.String(100), unique=True, nullable=False)
     data = db.Column(db.Text, nullable=False)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expiry = db.Column(db.DateTime)
+
     owner_id = db.Column(db.Integer)
 
+    status = db.Column(db.String(20), default="active")
+
+    # Security
+    is_protected = db.Column(db.Boolean, default=False)
+    password_hash = db.Column(db.String(200))
+
+    # One-time
+    is_one_time = db.Column(db.Boolean, default=False)
+    is_used = db.Column(db.Boolean, default=False)
+
+class ScanLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    qr_id = db.Column(db.Integer)
+    scanned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # NEW 🔥
+    ip_address = db.Column(db.String(100))
+    location = db.Column(db.String(200))
 
 with app.app_context():
     db.create_all()
 
 
+# ----------------------------
+# GENERATE QR
+# ----------------------------
 @app.route("/generate", methods=["GET", "POST"])
 def generate():
     if request.method == "POST":
         data = request.form["data"].strip()
         expiry_minutes = int(request.form["expiry"])
-
-        qr_id = str(uuid.uuid4())
+        password = request.form.get("password")
+        one_time = request.form.get("one_time") == "on"
+        token = str(uuid.uuid4())
         expiry_time = datetime.utcnow() + timedelta(minutes=expiry_minutes)
 
-        is_url = (
-            data.startswith("http://")
-            or data.startswith("https://")
-            or ("." in data and " " not in data)
+        hashed_password = None
+        is_protected = False
+
+        if password:
+            hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+            is_protected = True
+
+        new_qr = QR(
+            token=token,
+            data=data,
+            expiry=expiry_time,
+            owner_id=session.get("user_id"),
+            is_protected=is_protected,
+            password_hash=hashed_password,
+            is_one_time=True if one_time else False
         )
 
-        if is_url:
-            if not data.startswith("http"):
-                data = "https://" + data
-            qr_content = data
-        else:
-            base_url = request.host_url
-            qr_content = f"{base_url}verify/{qr_id}"
+        db.session.add(new_qr)
+        db.session.commit()
 
-            new_qr = QR(
-                qr_id=qr_id,
-                data=data,
-                created_at=datetime.utcnow(),
-                expiry=expiry_time,
-                owner_id=session.get("user_id")
-            )
-            db.session.add(new_qr)
-            db.session.commit()
+        qr_content = f"{request.host_url}verify/{token}"
 
         img = qrcode.make(qr_content)
 
         if not os.path.exists("static"):
             os.makedirs("static")
 
-        img_path = f"static/{qr_id}.png"
+        img_path = f"static/{token}.png"
         img.save(img_path)
 
         return render_template("qr_result.html", qr_image=img_path, data=data)
 
     return render_template("generate.html")
 
+def get_location(ip):
+    try:
+        if ip == "127.0.0.1" or ip.startswith("192."):
+            return "Local Network"
 
+        res = requests.get(f"http://ip-api.com/json/{ip}", timeout=1).json()
+
+        if res.get("status") == "success":
+            return f"{res.get('city')}, {res.get('country')}"
+
+        return "Unknown"
+    except:
+        return "Unknown"
+
+
+@app.route("/save_location")
+def save_location():
+    lat = request.args.get("lat")
+    lon = request.args.get("lon")
+
+    print("GPS Location:", lat, lon)
+
+    return "OK"
+
+# ----------------------------
 @app.route("/history")
 def history():
     records = QR.query.all()
+
     ist = timezone("Asia/Kolkata")
 
     current_time_ist = datetime.utcnow().replace(
@@ -102,6 +157,27 @@ def history():
             tzinfo=timezone("UTC")
         ).astimezone(ist)
 
+        # Scan count
+        logs = ScanLog.query.filter_by(qr_id=r.id).all()
+        r.scan_count = len(logs)
+
+        if logs:
+            last_scan = logs[-1]
+            
+        # Last scan
+        last_scan = ScanLog.query.filter_by(qr_id=r.id)\
+            .order_by(ScanLog.scanned_at.desc()).first()
+
+        if last_scan:
+            r.last_scanned = last_scan.scanned_at.replace(
+                tzinfo=timezone("UTC")
+            ).astimezone(ist)
+
+            r.last_location = last_scan.location
+        else:
+            r.last_scanned = None
+            r.last_location = "No scans yet"
+
     return render_template(
         "history.html",
         records=records,
@@ -109,19 +185,96 @@ def history():
     )
 
 
-@app.route("/verify/<qr_id>")
-def verify_qr(qr_id):
-    qr = QR.query.filter_by(qr_id=qr_id).first()
+@app.route("/qr_details/<int:qr_id>")
+def qr_details(qr_id):
+    qr = QR.query.get(qr_id)
+
+    if not qr:
+        return "QR not found", 404
+
+    logs = ScanLog.query.filter_by(qr_id=qr_id)\
+        .order_by(ScanLog.scanned_at.desc()).all()
+
+    ist = timezone("Asia/Kolkata")
+
+    for log in logs:
+        log.scanned_at_ist = log.scanned_at.replace(
+            tzinfo=timezone("UTC")
+        ).astimezone(ist)
+
+    return render_template("qr_details.html", qr=qr, logs=logs)
+
+# ----------------------------
+# VERIFY QR (FINAL)
+# ----------------------------
+@app.route("/verify/<token>", methods=["GET", "POST"])
+def verify_qr(token):
+    qr = QR.query.filter_by(token=token).first()
 
     if not qr:
         return render_template("invalid.html")
 
+    # Expiry check
     if datetime.utcnow() > qr.expiry:
+        qr.status = "expired"
+        db.session.commit()
         return render_template("expired.html")
+
+    # One-time already used
+    if qr.is_one_time and qr.is_used:
+        return render_template("expired.html")
+
+    # 🌍 GET USER IP + LOCATION (ADD THIS)
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    location = get_location(ip)
+    print("User IP:", ip)
+
+    # Password protection
+    if qr.is_protected:
+
+        if request.method == "POST":
+            entered_password = request.form.get("password")
+
+            if bcrypt.checkpw(entered_password.encode(), qr.password_hash.encode()):
+
+                # 🔥 LOG WITH LOCATION
+                log = ScanLog(
+                    qr_id=qr.id,
+                    ip_address=ip,
+                    location="Fetching..."
+                )
+                db.session.add(log)
+                db.session.commit()
+
+                if qr.is_one_time:
+                    qr.is_used = True
+
+                db.session.commit()
+
+                return render_template("valid.html", data=qr.data)
+            else:
+                return render_template("enter_password.html", error="Wrong password")
+
+        return render_template("enter_password.html")
+
+    # 🔥 NORMAL QR LOGGING WITH LOCATION
+    log = ScanLog(
+        qr_id=qr.id,
+        ip_address=ip,
+        location=location
+    )
+    db.session.add(log)
+
+    if qr.is_one_time:
+        qr.is_used = True
+
+    db.session.commit()
 
     return render_template("valid.html", data=qr.data)
 
-
+# ----------------------------
+# SCANNER
+# ----------------------------
 @app.route("/scan_camera")
 def scan_camera():
     return render_template("scan_camera.html")
@@ -133,5 +286,56 @@ def scan_result():
     return render_template("scan_result.html", data=data)
 
 
+# ----------------------------
+# DOWNLOAD
+# ----------------------------
+@app.route("/download/<token>")
+def download_qr(token):
+    user_id = session.get("user_id")
+    if not user_id:
+        return "Unauthorized", 401
+
+    record = QR.query.filter_by(token=token, owner_id=user_id).first()
+    if not record:
+        return "Not found or unauthorized", 404
+
+    if datetime.utcnow() > record.expiry:
+        return "Cannot download expired QR code", 403
+
+    file_path = os.path.join("static", f"{token}.png")
+
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+
+    return "File not found", 404
+
+
+# ----------------------------
+# DELETE
+# ----------------------------
+@app.route("/delete/<token>")
+def delete_qr(token):
+    user_id = session.get("user_id")
+    if not user_id:
+        return "Unauthorized", 401
+
+    record = QR.query.filter_by(token=token, owner_id=user_id).first()
+    if not record:
+        return "Not found", 404
+
+    file_path = os.path.join("static", f"{token}.png")
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    db.session.delete(record)
+    db.session.commit()
+
+    return redirect("/history")
+
+
+# ----------------------------
+# RUN
+# ----------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))

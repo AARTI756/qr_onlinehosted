@@ -6,5 +6,13 @@
 <body>
     <h1 style="color:green;">✅ QR is Valid</h1>
     <p><strong>Data:</strong> {{ data }}</p>
+    <script>
+navigator.geolocation.getCurrentPosition(function(position) {
+    let lat = position.coords.latitude;
+    let lon = position.coords.longitude;
+
+    fetch(`/save_location?lat=${lat}&lon=${lon}`);
+});
+</script>
 </body>
 </html>

@@ -1,11 +1,13 @@
 /* ---------------- Global ---------------- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f6f9;
     color: #333;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #f4f6f9, #e9eff5);
 }
 
-h3 {
+h2, h3 {
     color: #0d6efd; /* Bootstrap primary blue */
 }
 
@@ -25,7 +27,7 @@ h3 {
 }
 
 .nav-link:hover {
-    color: #ffc107 !important; /* Highlight on hover */
+    color: #ffc107 !important;
 }
 
 /* ---------------- Cards ---------------- */
@@ -41,16 +43,12 @@ h3 {
 .btn-primary {
     background: linear-gradient(135deg, #4e9af1, #1b60d2);
     border: none;
-    transition: 0.3s;
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #1b60d2, #4e9af1);
     transform: translateY(-2px);
-}
-
-.btn-sm {
-    padding: 0.25rem 0.6rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 /* ---------------- Tables ---------------- */
@@ -126,4 +124,65 @@ footer {
     #camera_feed {
         max-height: 300px;
     }
+}
+
+
+.feature-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+body {
+    background: linear-gradient(to bottom, #f4f6f9, #e9eff5);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4e9af1, #1b60d2);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+    .feature-card {
+        margin-bottom: 20px;
+    }
+}
+
+
+.feature-card {
+    padding: 2rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+
+.feature-card {
+    will-change: transform, box-shadow;
+}
+
+.feature-card {
+    text-align: center;
+}
+
+
+body {
+    font-size: 16px;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.btn {
+    border-radius: 10px;
 }
