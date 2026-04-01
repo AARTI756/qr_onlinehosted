@@ -228,6 +228,18 @@ def verify_qr(token):
 
     return render_template("valid.html", data=qr.data)
 
+# ----------------------------
+# SCANNER
+# ----------------------------
+@app.route("/scan_camera")
+def scan_camera():
+    return render_template("scan_camera.html")
+
+
+@app.route("/scan_result")
+def scan_result():
+    data = request.args.get("data")
+    return render_template("scan_result.html", data=data)
 
 # ----------------------------
 # DOWNLOAD
