@@ -266,8 +266,14 @@ def qr_details(qr_id):
 @app.route("/scan_result")
 def scan_result():
     data = request.args.get("data")
-    return render_template("scan_result.html", data=data)
 
+    qr_type = detect_qr_type(data) if data else "Unknown"
+
+    return render_template(
+        "scan_result.html",
+        data=data,
+        qr_type=qr_type
+    )
 # ----------------------------
 # DOWNLOAD
 # ----------------------------
@@ -288,7 +294,21 @@ def download_qr(token):
 
     return "File not found", 404
 
+import re
 
+def detect_qr_type(data):
+    # URL detection
+    if re.match(r'https?://\S+|www\.\S+', data):
+        return "URL 🌐"
+    
+    # Email detection
+    elif re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', data):
+        return "Email 📧"
+    
+    # Default → Text
+    else:
+        return "Text 📝"
+    
 # ----------------------------
 # DELETE
 # ----------------------------
