@@ -1,12 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>QR Valid</title>
-</head>
-<body>
-    <h1 style="color:green;">✅ QR is Valid</h1>
-    <p><strong>Data:</strong> {{ data }}</p>
-    <script>
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5 text-center">
+
+    <h2 class="text-success">✅ QR is Valid</h2>
+
+    <div class="card shadow p-4 mt-4">
+
+        <!-- 📦 Data -->
+        <p><strong>Data:</strong></p>
+        <div class="alert alert-info">
+            {{ data }}
+        </div>
+
+        <!-- 🧠 Detected Type -->
+        <p class="mt-3"><strong>Detected Type:</strong></p>
+
+        <span class="badge 
+            {% if 'URL' in qr_type %}bg-primary
+            {% elif 'Email' in qr_type %}bg-success
+            {% else %}bg-secondary
+            {% endif %}
+            p-2">
+            {{ qr_type }}
+        </span>
+
+        <!-- 🌐 Open Link Button -->
+        {% if is_url %}
+            <div class="mt-3">
+                <a href="{{ data }}" target="_blank" class="btn btn-success">
+                    Open Link 🌐
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- 📍 GPS LOCATION SCRIPT (UNCHANGED) -->
+<script>
 navigator.geolocation.getCurrentPosition(function(position) {
     let lat = position.coords.latitude;
     let lon = position.coords.longitude;
@@ -14,5 +48,5 @@ navigator.geolocation.getCurrentPosition(function(position) {
     fetch(`/save_location?lat=${lat}&lon=${lon}`);
 });
 </script>
-</body>
-</html>
+
+{% endblock %}

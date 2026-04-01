@@ -217,8 +217,21 @@ def verify_qr(token):
                     qr.is_used = True
 
                 db.session.commit()
-                return render_template("valid.html", data=qr.data)
+                qr_type = detect_qr_type(qr.data)
 
+                is_url = (qr_type == "URL 🌐")
+
+                # Fix URL format
+                data = qr.data
+                if is_url and not data.startswith("http"):
+                    data = "http://" + data
+
+                return render_template(
+                    "valid.html",
+                    data=data,
+                    qr_type=qr_type,
+                    is_url=is_url
+                )                
             return render_template("enter_password.html", error="Wrong password")
 
         return render_template("enter_password.html")
@@ -231,8 +244,20 @@ def verify_qr(token):
 
     db.session.commit()
 
-    return render_template("valid.html", data=qr.data)
+    # ✅ ADD THIS
+    qr_type = detect_qr_type(qr.data)
+    is_url = (qr_type == "URL 🌐")
 
+    data = qr.data
+    if is_url and not data.startswith("http"):
+        data = "http://" + data
+
+    return render_template(
+        "valid.html",
+        data=data,
+        qr_type=qr_type,
+        is_url=is_url
+    )   
 # ----------------------------
 # SCANNER
 # ----------------------------
@@ -263,17 +288,25 @@ def qr_details(qr_id):
     return render_template("qr_details.html", qr=qr, logs=logs)
 
 
+from flask import redirect
+
 @app.route("/scan_result")
 def scan_result():
     data = request.args.get("data")
 
     qr_type = detect_qr_type(data) if data else "Unknown"
 
+    # Fix URL format
+    if qr_type == "URL 🌐" and not data.startswith("http"):
+        data = "http://" + data
+
     return render_template(
         "scan_result.html",
         data=data,
-        qr_type=qr_type
+        qr_type=qr_type,
+        is_url=(qr_type == "URL 🌐")
     )
+
 # ----------------------------
 # DOWNLOAD
 # ----------------------------
