@@ -1,21 +1,37 @@
 {% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form method="POST">
-        Email:<br>
-        <input type="email" name="email"><br>
-        Password:<br>
-        <input type="password" name="password"><br><br>
-        <button type="submit">Login</button>
-    </form>
-    <a href="/register">Register</a>
-</body>
-</html>
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+
+        <div class="card shadow-lg p-4">
+            <h3 class="text-center mb-3">Welcome Back 👋</h3>
+            <p class="text-center text-muted">Login to access your QR dashboard</p>
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <small>Don't have an account?</small><br>
+                <a href="/register">Create Account</a>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 {% endblock %}

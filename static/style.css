@@ -186,3 +186,17 @@ body {
 .btn {
     border-radius: 10px;
 }
+
+body {
+    background: #f4f6f9;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
