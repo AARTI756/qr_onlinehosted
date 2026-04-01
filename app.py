@@ -235,6 +235,28 @@ def verify_qr(token):
 def scan_camera():
     return render_template("scan_camera.html")
 
+# ----------------------------
+# QR DETAILS
+# ----------------------------
+@app.route("/qr_details/<int:qr_id>")
+def qr_details(qr_id):
+    qr = QR.query.get(qr_id)
+
+    if not qr:
+        return "QR not found", 404
+
+    logs = ScanLog.query.filter_by(qr_id=qr_id)\
+        .order_by(ScanLog.scanned_at.desc()).all()
+
+    ist = timezone("Asia/Kolkata")
+
+    for log in logs:
+        log.scanned_at_ist = log.scanned_at.replace(
+            tzinfo=timezone("UTC")
+        ).astimezone(ist)
+
+    return render_template("qr_details.html", qr=qr, logs=logs)
+
 
 @app.route("/scan_result")
 def scan_result():
