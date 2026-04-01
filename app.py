@@ -122,10 +122,12 @@ def get_location(ip):
         if ip == "127.0.0.1" or ip.startswith("192."):
             return "Local Network"
 
-        res = requests.get(f"http://ip-api.com/json/{ip}", timeout=1).json()
+        res = requests.get(f"http://ip-api.com/json/{ip}", timeout=2).json()
 
         if res.get("status") == "success":
-            return f"{res.get('city')}, {res.get('country')}"
+            city = res.get("city", "")
+            country = res.get("country", "")
+            return f"{city}, {country}".strip(", ")
 
         return "Unknown"
     except:
@@ -198,6 +200,9 @@ def verify_qr(token):
         return render_template("expired.html")
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+    if ip:
+        ip = ip.split(",")[0].strip()  # ✅ get real user IP only
     location = get_location(ip)
 
     if qr.is_protected:
