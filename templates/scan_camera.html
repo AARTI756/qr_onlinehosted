@@ -8,15 +8,36 @@
         You can scan a QR code using your camera or upload an image below.
     </p>
 
-    <!-- QR scanner -->
+    <!-- 📷 Camera Scanner -->
     <div id="reader" style="width: 100%; max-width: 400px; margin: auto;"></div>
+
     <!-- Result -->
     <p id="result" class="mt-3 fw-bold"></p>
 
-    <!-- Proceed Button (used only for upload) -->
+    <!-- Proceed Button -->
     <button id="proceedBtn" class="btn btn-primary mt-3" onclick="processQR()" disabled>
         Proceed
     </button>
+
+    <!-- 📁 Upload Option -->
+    <div class="mt-5">
+        <h5>Or Upload QR Image</h5>
+        <form action="/scan_upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required class="form-control">
+            <button class="btn btn-success mt-2">Upload & Scan</button>
+        </form>
+    </div>
+
+    <!-- 🔍 Explanation Section -->
+    <div class="mt-5 text-start">
+        <h4>🔍 How QR Detection Works</h4>
+        <ul>
+            <li>📷 Image is converted to grayscale</li>
+            <li>🧹 Noise is reduced for better clarity</li>
+            <li>⬛ Finder patterns detect QR position</li>
+            <li>🔲 Alignment pattern corrects distortion</li>
+        </ul>
+    </div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -24,31 +45,29 @@
 <script>
 let scannedData = null;
 
-// When QR is scanned (camera OR upload)
 function onScanSuccess(decodedText, decodedResult) {
     document.getElementById('result').innerHTML =
         "<strong>Scanned:</strong> " + decodedText;
 
     scannedData = decodedText;
 
-    // 📷 Camera scan → auto proceed
+    // Camera scan → auto proceed
     if (decodedResult && decodedResult.result) {
-        setTimeout(() => processQR(), 800); // small delay for UX
+        setTimeout(() => processQR(), 800);
     } 
-    // 📁 Upload scan → enable button
+    // Upload scan → enable button
     else {
         document.getElementById('proceedBtn').disabled = false;
     }
 }
 
-// Initialize scanner (camera + built-in upload)
 let html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",
     { fps: 10, qrbox: 250 }
 );
+
 html5QrcodeScanner.render(onScanSuccess);
 
-// Process QR
 function processQR() {
     if (!scannedData) {
         alert("Please scan or upload a QR code first.");

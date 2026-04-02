@@ -1,20 +1,19 @@
 # 🚀 Smart QR Intelligence
 
-**Machine Vision Based Secure QR Generator & Scanner Web Application**
+**Machine Vision-Based Secure QR Generator & Scanner Web Application**
 
 ---
 
 ## 📌 Overview
 
-Smart QR Intelligence is an advanced QR-based web application built using **Computer Vision and intelligent logic**.
-It allows users to **generate, scan, and analyze QR codes** with added security and smart detection features.
+Smart QR Intelligence is a feature-rich QR-based web application that enables users to **generate, scan, and analyze QR codes** with enhanced security and intelligent detection features.
 
-This project combines concepts from:
+This project integrates concepts from:
 
-* Machine Vision
-* Web Development
-* Security Systems
-* AI/ML-inspired logic (data type detection & analytics)
+* 🧠 Machine Vision
+* 🌐 Web Development
+* 🔒 Security Systems
+* 🤖 Rule-based Intelligent Logic
 
 ---
 
@@ -22,29 +21,58 @@ This project combines concepts from:
 
 ### 🔐 QR Generation
 
-* Generate QR codes for any text, URL, or email
+* Generate QR codes for text, URLs, or emails
 * Set **expiry time** for QR codes
 * Add **password protection**
-* Enable **one-time scan QR**
+* Enable **one-time scan QR codes**
 
 ---
 
 ### 📷 QR Scanning
 
-* Scan QR using **live camera (OpenCV)**
-* Upload image to detect QR
-* Instant decoding and processing
+* Scan QR using **live camera (browser-based using html5-qrcode)**
+* Upload image to scan QR (**OpenCV with preprocessing**)
+* Instant decoding and result display
 
 ---
 
-### 🧠 Smart Detection (AI Logic)
+### 🧠 Smart Detection (Rule-Based AI Logic)
 
-* Automatically detects QR content type:
+* Automatically classifies QR content using pattern matching:
 
-  * 🌐 URL
-  * 📧 Email
-  * 📝 Text
-* Dynamic UI response based on detected type
+  * 🌐 URL detection
+  * 📧 Email detection
+  * 📝 Plain text detection
+
+* Enables dynamic UI behavior based on detected type
+
+---
+
+### ⚠️ Malicious URL Detection
+
+* Detects potentially unsafe or phishing links using keyword analysis:
+
+  * login, verify, update, bank, secure, account, password, confirm
+
+* Displays warning:
+  ⚠️ **“Potential phishing or suspicious link detected”**
+
+* Enhances user safety while opening unknown QR links
+
+---
+
+### 🧠 Machine Vision Concepts Used
+
+This project incorporates fundamental image processing techniques:
+
+* 📷 **Grayscale Conversion** – simplifies the image for better detection
+* 🧹 **Noise Reduction** – improves clarity using Gaussian Blur
+* 🔍 **QR Pattern Detection:**
+
+  * Finder Patterns (corner squares)
+  * Alignment Pattern (distortion correction)
+
+These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
@@ -55,14 +83,15 @@ This project combines concepts from:
   * IP Address
   * Location (City, Country)
   * Scan timestamp
-* Maintains complete **scan history dashboard**
+
+* Maintains a complete **scan history dashboard**
 
 ---
 
 ### 🔄 Smart Actions
 
 * Auto **redirect if QR contains URL**
-* Show actionable buttons based on content
+* Display dynamic actions based on QR content
 
 ---
 
@@ -71,6 +100,22 @@ This project combines concepts from:
 * User Registration & Login
 * Personal QR history
 * Secure access to generated QR codes
+
+---
+
+## ⚙️ How It Works
+
+1. User generates a QR code with optional security settings
+2. QR stores a secure **token-based URL**
+3. When scanned:
+
+   * Image is processed (for uploaded images)
+   * QR is decoded
+   * Token is verified
+   * Security checks applied (expiry, password, one-time use)
+   * Malicious URL check performed
+4. Content is displayed or redirected based on type
+5. Scan details are logged for analytics
 
 ---
 
@@ -106,14 +151,15 @@ This project combines concepts from:
 ## 🧩 System Architecture
 
 1. User generates QR → Stored in database
-2. QR contains secure token-based URL
+2. QR contains a secure token-based URL
 3. On scan:
 
-   * QR is verified
-   * Security checks applied (expiry, password)
+   * QR is decoded
+   * Security checks applied
    * Data processed
    * Type detected
-4. Scan logged with metadata (IP, location, time)
+   * Malicious link checked
+4. Scan is logged with metadata (IP, location, timestamp)
 
 ---
 
@@ -122,8 +168,9 @@ This project combines concepts from:
 * Token-based QR validation
 * Expiry-based access control
 * Password-protected QR codes
-* One-time usable QR
+* One-time usable QR codes
 * Unauthorized access prevention
+* Basic phishing/malicious link detection
 
 ---
 
@@ -132,17 +179,30 @@ This project combines concepts from:
 * 📈 Scan analytics dashboard (graphs & insights)
 * 🤖 ML-based classification model
 * ☁️ Cloud database integration
-* 📱 Mobile app version
+* 📱 Mobile application version
 
 ---
 
 ## 🚀 Deployment
 
-Deployed using:
+Deployed on:
 
 * Render (Cloud Platform)
 
 🔗 Live Demo: https://qr-onlinehosted.onrender.com/
+
+---
+
+## 💻 Run Locally
+
+```bash
+git clone https://github.com/AARTI756/qr_onlinehosted
+cd qr_onlinehosted
+python -m venv venv
+venv\Scripts\activate   # For Windows
+pip install -r requirements.txt
+python app.py
+```
 
 ---
 
@@ -161,9 +221,10 @@ This project is for academic and learning purposes.
 ## ⭐ Project Highlights
 
 ✔ Secure QR system
-✔ Machine vision integration
-✔ Smart detection logic (AI-inspired)
+✔ Machine Vision integration
+✔ Intelligent detection logic
 ✔ Real-time scanning & analytics
+✔ Basic phishing/malicious link detection
 ✔ Full-stack implementation
 
 ---

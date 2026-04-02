@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, session, redirect, send_file
 import requests
 from flask_sqlalchemy import SQLAlchemy
 from modules.auth import auth_routes
-
+import cv2
 import bcrypt
 import uuid
 import qrcode
@@ -226,11 +226,15 @@ def verify_qr(token):
                 if is_url and not data.startswith("http"):
                     data = "http://" + data
 
+                is_malicious = is_malicious_url(data) if is_url else False
+
                 return render_template(
                     "valid.html",
                     data=data,
                     qr_type=qr_type,
-                    is_url=is_url
+                    is_url=is_url,
+                    is_malicious=is_malicious
+
                 )                
             return render_template("enter_password.html", error="Wrong password")
 
@@ -251,12 +255,15 @@ def verify_qr(token):
     data = qr.data
     if is_url and not data.startswith("http"):
         data = "http://" + data
-
+    
+    is_malicious = is_malicious_url(data) if is_url else False
+    
     return render_template(
         "valid.html",
         data=data,
         qr_type=qr_type,
-        is_url=is_url
+        is_url=is_url,
+        is_malicious=is_malicious
     )   
 # ----------------------------
 # SCANNER
@@ -264,6 +271,53 @@ def verify_qr(token):
 @app.route("/scan_camera")
 def scan_camera():
     return render_template("scan_camera.html")
+
+@app.route("/scan_upload", methods=["POST"])
+def scan_upload():
+    file = request.files.get("file")
+
+    if not file:
+        return "No file uploaded"
+
+    filepath = os.path.join("static", file.filename)
+    file.save(filepath)
+
+    image = cv2.imread(filepath)
+
+    if image is None:
+        return "Invalid image"
+
+    # 📷 Step 1: Grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # 📷 Step 2: Noise reduction
+    blurred = cv2.GaussianBlur(gray, (5,5), 0)
+
+    # 🔍 Step 3: Detect QR
+    detector = cv2.QRCodeDetector()
+    data, bbox, _ = detector.detectAndDecode(blurred)
+
+    if data:
+        return redirect(f"/scan_result?data={data}")
+    else:
+        return "No QR detected"
+
+
+
+def is_malicious_url(url):
+    suspicious_keywords = [
+        "login", "verify", "update", "bank", "secure",
+        "account", "password", "confirm", "signin"
+    ]
+
+    url_lower = url.lower()
+
+    for word in suspicious_keywords:
+        if word in url_lower:
+            return True
+
+    return False
+
 
 # ----------------------------
 # QR DETAILS
@@ -300,11 +354,15 @@ def scan_result():
     if qr_type == "URL 🌐" and not data.startswith("http"):
         data = "http://" + data
 
+    is_url = (qr_type == "URL 🌐")
+    is_malicious = is_malicious_url(data) if is_url else False
+
     return render_template(
         "scan_result.html",
         data=data,
         qr_type=qr_type,
-        is_url=(qr_type == "URL 🌐")
+        is_url=is_url,
+        is_malicious=is_malicious
     )
 
 # ----------------------------

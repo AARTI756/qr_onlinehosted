@@ -33,6 +33,13 @@
             </div>
         {% endif %}
 
+
+        {% if is_malicious %}
+            <div class="alert alert-danger mt-3">
+                ⚠️ Warning: Potential phishing or suspicious link detected!
+            </div>
+        {% endif %}
+
     </div>
 
     <a href="/scan_camera" class="btn btn-primary mt-4">
