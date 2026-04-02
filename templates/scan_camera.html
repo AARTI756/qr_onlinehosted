@@ -21,7 +21,6 @@
         </div>
 
         <!-- 🔄 Scan Line -->
-        <div class="scan-line"></div>
     </div>
 
     <p id="result" class="mt-3 fw-bold"></p>
@@ -68,22 +67,7 @@
 .bl { bottom: 0; left: 0; border-right: none; border-top: none; }
 .br { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-/* 🔄 Scan line */
-.scan-line {
-    position: absolute;
-    width: 250px;
-    height: 3px;
-    background: lime;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%);
-    animation: scanMove 2s linear infinite;
-}
 
-@keyframes scanMove {
-    0% { transform: translate(-50%, -120px); }
-    100% { transform: translate(-50%, 120px); }
-}
 </style>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
