@@ -5,28 +5,14 @@
     <h2 class="mb-4">Scan QR Code</h2>
 
     <p class="text-muted">
-        You can scan a QR code using your camera or upload an image below.
+        Scan using camera or upload an image — auto detection enabled.
     </p>
 
-    <!-- 📷 Camera Scanner -->
+    <!-- 📷 Scanner (camera + upload built-in) -->
     <div id="reader" style="width: 100%; max-width: 400px; margin: auto;"></div>
 
     <!-- Result -->
     <p id="result" class="mt-3 fw-bold"></p>
-
-    <!-- Proceed Button -->
-    <button id="proceedBtn" class="btn btn-primary mt-3" onclick="processQR()" disabled>
-        Proceed
-    </button>
-
-    <!-- 📁 Upload Option -->
-    <div class="mt-5">
-        <h5>Or Upload QR Image</h5>
-        <form action="/scan_upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept="image/*" required class="form-control">
-            <button class="btn btn-success mt-2">Upload & Scan</button>
-        </form>
-    </div>
 
     <!-- 🔍 Explanation Section -->
     <div class="mt-5 text-start">
@@ -43,41 +29,46 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-let scannedData = null;
+let isProcessing = false; // 🚀 prevent multiple redirects
 
 function onScanSuccess(decodedText, decodedResult) {
+    if (isProcessing) return; // stop duplicate trigger
+    isProcessing = true;
+
     document.getElementById('result').innerHTML =
         "<strong>Scanned:</strong> " + decodedText;
 
-    scannedData = decodedText;
-
-    // Camera scan → auto proceed
-    if (decodedResult && decodedResult.result) {
-        setTimeout(() => processQR(), 800);
-    } 
-    // Upload scan → enable button
-    else {
-        document.getElementById('proceedBtn').disabled = false;
-    }
+    setTimeout(() => {
+        processQR(decodedText);
+    }, 500); // small delay for smooth UX
 }
 
 let html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",
-    { fps: 10, qrbox: 250 }
+    {
+        fps: 10,
+        qrbox: 250,
+        rememberLastUsedCamera: true,
+        showTorchButtonIfSupported: true
+    }
 );
 
 html5QrcodeScanner.render(onScanSuccess);
 
-function processQR() {
-    if (!scannedData) {
-        alert("Please scan or upload a QR code first.");
+// 🚀 AUTO PROCESS (no button needed)
+function processQR(data) {
+    if (!data) {
+        alert("No QR data found");
         return;
     }
 
-    if (scannedData.includes("/verify/")) {
-        window.location.href = scannedData;
-    } else {
-        window.location.href = "/scan_result?data=" + encodeURIComponent(scannedData);
+    // If it's your system QR
+    if (data.includes("/verify/")) {
+        window.location.href = data;
+    } 
+    // Otherwise go to scan result
+    else {
+        window.location.href = "/scan_result?data=" + encodeURIComponent(data);
     }
 }
 </script>
