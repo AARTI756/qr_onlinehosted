@@ -3,51 +3,58 @@
 {% block content %}
 <div class="container mt-5 text-center">
 
-    <h2 class="mb-4">Scan QR Code</h2>
+    <h2 class="mb-3">Scan QR Code</h2>
+    <p class="text-muted">Scan using camera or upload a QR image</p>
 
-    <!-- ✅ Camera Instructions -->
-    <div class="alert alert-info text-start" style="max-width: 500px; margin:auto;">
-        <h6>📷 Scan using Camera:</h6>
+    <!-- 📷 CAMERA INSTRUCTIONS -->
+    <div class="alert alert-info text-start mx-auto" style="max-width: 500px;">
+        <h6 class="mb-2">📷 Scan using Camera:</h6>
         <ul class="mb-0">
             <li>Allow camera permission when prompted</li>
             <li>Hold your device steady</li>
             <li>Align QR code inside the frame</li>
-            <li>Scanning will happen automatically</li>
+            <li>Scanning happens automatically</li>
         </ul>
     </div>
 
-    <!-- 📷 Scanner -->
+    <!-- 📷 CAMERA SCANNER -->
     <div class="scanner-wrapper mt-4">
         <div id="reader"></div>
     </div>
 
-    <!-- 📁 Upload Section -->
-    <div class="mt-5" style="max-width: 500px; margin:auto;">
+    <!-- 🔽 DIVIDER -->
+    <div class="my-4">
+        <hr>
+        <span class="text-muted">OR</span>
+    </div>
 
-        <!-- ✅ Upload Instructions -->
+    <!-- 📁 UPLOAD SECTION -->
+    <div class="mx-auto" style="max-width: 500px;">
+
+        <!-- Upload Instructions -->
         <div class="alert alert-secondary text-start">
-            <h6>📁 Scan using Image Upload:</h6>
+            <h6 class="mb-2">📁 Scan using Image Upload:</h6>
             <ul class="mb-0">
                 <li>Select a QR code image from your device</li>
-                <li>Click "Upload & Scan"</li>
-                <li>The system will detect and process the QR</li>
+                <li>Click <b>"Upload & Scan"</b></li>
+                <li>System will automatically detect the QR</li>
             </ul>
         </div>
 
         <!-- Upload Form -->
         <form action="/scan_upload" method="POST" enctype="multipart/form-data">
             <input type="file" name="file" accept="image/*" required class="form-control">
-            <button class="btn btn-success mt-2">Upload & Scan</button>
+            <button class="btn btn-success mt-3 w-100">Upload & Scan</button>
         </form>
 
     </div>
 
-    <!-- Result -->
-    <p id="result" class="mt-3 fw-bold"></p>
+    <!-- RESULT -->
+    <p id="result" class="mt-4 fw-bold"></p>
 
 </div>
 
-<!-- 🎨 CLEAN STYLES -->
+<!-- 🎨 STYLES -->
 <style>
 .scanner-wrapper {
     width: 100%;
@@ -55,11 +62,20 @@
     margin: auto;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    background: #000;
 }
 
 #reader {
     width: 100%;
+}
+
+/* Smooth button hover */
+button {
+    transition: 0.3s;
+}
+button:hover {
+    transform: scale(1.03);
 }
 </style>
 
@@ -87,14 +103,16 @@ function onScanSuccess(decodedText) {
         } else {
             window.location.href = "/scan_result?data=" + encodeURIComponent(decodedText);
         }
-    }, 800);
+    }, 700);
 }
 
+// ✅ FIX: CAMERA ONLY (removes duplicate upload)
 let html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",
     {
         fps: 10,
-        qrbox: 250
+        qrbox: 250,
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
     }
 );
 
