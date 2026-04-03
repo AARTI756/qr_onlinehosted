@@ -305,9 +305,21 @@ def scan_upload():
 
 
 def is_malicious_url(url):
+    # ✅ TRUST YOUR OWN DOMAIN
+    trusted_domains = [
+        "qr-onlinehosted.onrender.com",
+        "localhost",
+        "127.0.0.1"
+    ]
+
+    for domain in trusted_domains:
+        if domain in url:
+            return False   # ✅ Never mark your own URLs as malicious
+
+    # 🚨 Suspicious keywords (for external URLs only)
     suspicious_keywords = [
-        "login", "verify", "update", "bank", "secure",
-        "account", "password", "confirm", "signin"
+        "login", "verify", "update", "bank",
+        "secure", "account", "password", "confirm", "signin"
     ]
 
     url_lower = url.lower()
@@ -317,8 +329,6 @@ def is_malicious_url(url):
             return True
 
     return False
-
-
 # ----------------------------
 # QR DETAILS
 # ----------------------------
