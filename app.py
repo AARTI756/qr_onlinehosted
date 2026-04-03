@@ -199,17 +199,21 @@ def verify_qr(token):
     if qr.is_one_time and qr.is_used:
         return render_template("expired.html")
 
+    # ✅ Get real IP
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-
     if ip:
-        ip = ip.split(",")[0].strip()  # ✅ get real user IP only
+        ip = ip.split(",")[0].strip()
+
     location = get_location(ip)
 
+    # 🔐 PASSWORD PROTECTED FLOW
     if qr.is_protected:
         if request.method == "POST":
             entered_password = request.form.get("password")
 
             if bcrypt.checkpw(entered_password.encode(), qr.password_hash.encode()):
+                
+                # ✅ Save scan log
                 log = ScanLog(qr_id=qr.id, ip_address=ip, location=location)
                 db.session.add(log)
 
@@ -217,16 +221,9 @@ def verify_qr(token):
                     qr.is_used = True
 
                 db.session.commit()
-                qr_type = detect_qr_type(qr.data)
 
-                is_url = (qr_type == "URL 🌐")
-
-                # Fix URL format
-                data = qr.data
-                if is_url and not data.startswith("http"):
-                    data = "http://" + data
-
-                is_malicious = is_malicious_url(data) if is_url else False
+                # ✅ CLEAN PROCESSING (FIXED)
+                data, qr_type, is_url, is_malicious = process_qr_data(qr.data)
 
                 return render_template(
                     "valid.html",
@@ -234,12 +231,13 @@ def verify_qr(token):
                     qr_type=qr_type,
                     is_url=is_url,
                     is_malicious=is_malicious
+                )
 
-                )                
             return render_template("enter_password.html", error="Wrong password")
 
         return render_template("enter_password.html")
 
+    # 🔓 NORMAL FLOW
     log = ScanLog(qr_id=qr.id, ip_address=ip, location=location)
     db.session.add(log)
 
@@ -248,24 +246,18 @@ def verify_qr(token):
 
     db.session.commit()
 
-    # ✅ ADD THIS
-    qr_type = detect_qr_type(qr.data)
-    is_url = (qr_type == "URL 🌐")
+    # ✅ CLEAN PROCESSING (FIXED)
+    data, qr_type, is_url, is_malicious = process_qr_data(qr.data)
 
-    data = qr.data
-    if is_url and not data.startswith("http"):
-        data = "http://" + data
-    
-    is_malicious = is_malicious_url(data) if is_url else False
-    
     return render_template(
         "valid.html",
         data=data,
         qr_type=qr_type,
         is_url=is_url,
         is_malicious=is_malicious
-    )   
-# ----------------------------
+    )
+
+
 # SCANNER
 # ----------------------------
 @app.route("/scan_camera")
@@ -279,7 +271,8 @@ def scan_upload():
     if not file:
         return "No file uploaded"
 
-    filepath = os.path.join("static", file.filename)
+    filename = str(uuid.uuid4()) + ".png"
+    filepath = os.path.join("static", filename)
     file.save(filepath)
 
     image = cv2.imread(filepath)
@@ -298,35 +291,51 @@ def scan_upload():
     data, bbox, _ = detector.detectAndDecode(blurred)
 
     if data:
+        os.remove(filepath)  # ✅ delete file after processing
         return redirect(f"/scan_result?data={data}")
     else:
+        os.remove(filepath)  # ✅ delete file even if failed
         return "No QR detected"
 
 
+from urllib.parse import urlparse
 
 def is_malicious_url(url):
-    # ✅ TRUST YOUR OWN DOMAIN
+    url = url.strip().lower()
+
+    # ✅ Normalize (important!)
+    if not url.startswith("http"):
+        url = "http://" + url
+
+    parsed = urlparse(url)
+    domain = parsed.netloc
+
+    # ✅ Trusted domains
     trusted_domains = [
         "qr-onlinehosted.onrender.com",
         "localhost",
         "127.0.0.1"
     ]
 
-    for domain in trusted_domains:
-        if domain in url:
-            return False   # ✅ Never mark your own URLs as malicious
+    if any(td in domain for td in trusted_domains):
+        return False
 
-    # 🚨 Suspicious keywords (for external URLs only)
+    # 🚨 Suspicious keywords
     suspicious_keywords = [
         "login", "verify", "update", "bank",
         "secure", "account", "password", "confirm", "signin"
     ]
 
-    url_lower = url.lower()
+    if any(word in url for word in suspicious_keywords):
+        return True
 
-    for word in suspicious_keywords:
-        if word in url_lower:
-            return True
+    # 🚨 Heuristic 1: too many hyphens
+    if domain.count("-") >= 2:
+        return True
+
+    # 🚨 Heuristic 2: long domain
+    if len(domain) > 25:
+        return True
 
     return False
 # ----------------------------
@@ -352,20 +361,11 @@ def qr_details(qr_id):
     return render_template("qr_details.html", qr=qr, logs=logs)
 
 
-from flask import redirect
-
 @app.route("/scan_result")
 def scan_result():
-    data = request.args.get("data")
+    raw_data = request.args.get("data")
 
-    qr_type = detect_qr_type(data) if data else "Unknown"
-
-    # Fix URL format
-    if qr_type == "URL 🌐" and not data.startswith("http"):
-        data = "http://" + data
-
-    is_url = (qr_type == "URL 🌐")
-    is_malicious = is_malicious_url(data) if is_url else False
+    data, qr_type, is_url, is_malicious = process_qr_data(raw_data)
 
     return render_template(
         "scan_result.html",
@@ -398,18 +398,39 @@ def download_qr(token):
 import re
 
 def detect_qr_type(data):
-    # URL detection
-    if re.match(r'https?://\S+|www\.\S+', data):
+    raw = data.strip()   # ✅ keep original
+    lower = raw.lower()  # only for checking
+
+    url_pattern = r'^(https?://|www\.)\S+'
+    domain_pattern = r'^[a-z0-9\-]+\.[a-z]{2,}'
+
+    if re.match(url_pattern, lower) or re.match(domain_pattern, lower):
         return "URL 🌐"
-    
-    # Email detection
-    elif re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', data):
+
+    elif re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', raw):
         return "Email 📧"
-    
-    # Default → Text
-    else:
-        return "Text 📝"
-    
+
+    return "Text 📝"
+
+def process_qr_data(raw_data):
+    if not raw_data:
+        return "", "Unknown", False, False
+
+    qr_type = detect_qr_type(raw_data)
+
+    data = raw_data.strip()
+
+    # Normalize URL
+    if "URL" in qr_type and not data.startswith("http"):
+        data = "http://" + data
+
+    is_url = ("URL" in qr_type)
+
+    # Only check malicious for URLs
+    is_malicious = is_malicious_url(data) if is_url else False
+
+    return data, qr_type, is_url, is_malicious
+
 # ----------------------------
 # DELETE
 # ----------------------------

@@ -4,53 +4,49 @@
 
 {% block content %}
 
-<div class="text-center mb-5">
-    <h1 class="fw-bold">Welcome to Smart QR Intelligence System</h1>
-    <p class="text-muted">
-        Secure, dynamic, and intelligent QR system with advanced encryption, controlled access, 
-        and automatic expiry to ensure your data stays safe and trackable.
+<!-- HERO SECTION -->
+<div class="hero-section text-center text-white p-5 rounded mb-5">
+    <h1 class="fw-bold display-4">Smart QR Intelligence</h1>
+    <p class="lead">
+        Secure • Trackable • Expiring QR Codes with Intelligence
     </p>
+    <a href="/generate" class="btn btn-light mt-3 px-4">Get Started</a>
 </div>
 
-<div class="row g-4">
+<div class="row g-4 justify-content-center">
 
     <div class="col-md-6 col-lg-3">
-        <div class="feature-card text-center p-4 shadow-sm rounded">
-            <h4>🔐 Secure & Expiring QR</h4>
-            <p>
-                Create QR codes that are encrypted for security and can automatically expire 
-                after a set time, ensuring safe and controlled access to your data.
-            </p>
-            <a href="/generate" class="btn btn-primary btn-sm mt-2">Generate QR</a>
+        <div class="feature-card p-4">
+            <div class="icon">🔐</div>
+            <h5>Secure QR</h5>
+            <p class="text-muted">Encrypted & auto-expiring QR codes.</p>
+            <a href="/generate" class="btn btn-primary btn-sm">Generate</a>
         </div>
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="feature-card text-center p-4 shadow-sm rounded">
-            <h4>📷 Scan QR</h4>
-            <p>
-                Scan QR codes easily and securely using your device camera. The system verifies 
-                the QR authenticity and ensures your data is protected.
-            </p>
-            <a href="/scan_camera" class="btn btn-primary btn-sm mt-2">Open Scanner</a>
+        <div class="feature-card p-4">
+            <div class="icon">📷</div>
+            <h5>Scan QR</h5>
+            <p class="text-muted">Smart and secure camera scanning.</p>
+            <a href="/scan_camera" class="btn btn-primary btn-sm">Scan</a>
         </div>
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="feature-card text-center p-4 shadow-sm rounded">
-            <h4>📊 History</h4>
-            <p>
-                Keep track of all generated and scanned QR codes. View detailed logs and 
-                manage your QR activity in one place.
-            </p>
-            <a href="/history" class="btn btn-primary btn-sm mt-2">View History</a>
+        <div class="feature-card p-4">
+            <div class="icon">📊</div>
+            <h5>Analytics</h5>
+            <p class="text-muted">Track scans, IP, and locations.</p>
+            <a href="/history" class="btn btn-primary btn-sm">View</a>
         </div>
     </div>
 
 </div>
+
 
 <div class="text-center mt-5">
-    <a href="/logout" class="btn btn-secondary">Logout</a>
+    <a href="/logout" class="btn btn-outline-dark">Logout</a>
 </div>
 
 {% endblock %}

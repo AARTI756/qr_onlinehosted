@@ -1,0 +1,240 @@
+/* ---------------- GLOBAL ---------------- */
+body {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #f4f6f9, #e9eff5);
+}
+
+h1, h2, h3, h5 {
+    color: #063680;
+}
+
+/* ---------------- NAVBAR ---------------- */
+.navbar {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    color: #ffc107 !important;
+}
+
+/* ---------------- CONTAINER ---------------- */
+.container-fluid {
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* ---------------- HERO SECTION ---------------- */
+.hero-section {
+    background: linear-gradient(135deg, #272f3fc5, #4e9af1);
+    border-radius: 20px;
+    padding: 60px 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    color: #fff;
+}
+
+/* ---------------- CARDS ---------------- */
+.card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* ---------------- FEATURE CARDS ---------------- */
+.feature-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card .icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+/* ---------------- BUTTONS ---------------- */
+.btn {
+    border-radius: 12px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4e9af1, #1b60d2);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-light {
+    border-radius: 25px;
+    font-weight: 600;
+}
+
+/* ---------------- TABLES ---------------- */
+.table {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #0d6efd;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+/* ---------------- FORMS ---------------- */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+}
+
+/* ---------------- ALERTS ---------------- */
+.alert-success {
+    background-color: #e6f4ea;
+    color: #1f7a4d;
+    border: none;
+    font-weight: 500;
+}
+
+/* ---------------- CAMERA ---------------- */
+#camera_feed {
+    border-radius: 12px;
+    border: 2px solid #0d6efd;
+    max-height: 500px;
+}
+
+/* ---------------- QR RESULT ---------------- */
+#qr_result img {
+    border: 4px solid #0d6efd;
+    border-radius: 12px;
+    padding: 5px;
+    background-color: #fff;
+}
+
+/* ---------------- FOOTER ---------------- */
+footer {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+* {
+    transition: all 0.2s ease-in-out;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 768px) {
+    .card {
+        padding: 1.5rem;
+    }
+
+    .feature-card {
+        margin-bottom: 20px;
+    }
+
+    #camera_feed {
+        max-height: 300px;
+    }
+}
+
+/* ---------------- DARK MODE ---------------- */
+.dark-mode {
+    background: #121212 !important;
+    color: #ffffff !important;
+}
+
+/* Navbar */
+.dark-mode .navbar {
+    background-color: #1e1e1e !important;
+}
+
+/* Cards */
+.dark-mode .card,
+.dark-mode .feature-card {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+/* Text */
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h5,
+.dark-mode p {
+    color: #ffffff !important;
+}
+
+/* Buttons */
+.dark-mode .btn-primary {
+    background: linear-gradient(135deg, #3a7bd5, #2a5298);
+}
+
+/* Hero */
+.dark-mode .hero-section {
+    background: linear-gradient(135deg, #354156, #1e3c72);
+}
+
+/* Tables */
+.dark-mode .table {
+    background-color: #1e1e1e;
+    color: #fff;
+}
+
+.dark-mode .table th {
+    background-color: #a2c0f5;
+}
+
+/* Forms */
+.dark-mode .form-control {
+    background-color: #2b2b2b;
+    color: #fff;
+    border: 1px solid #444;
+}
+
+/* Footer */
+.dark-mode footer {
+    background-color: #1e1e1e !important;
+}
