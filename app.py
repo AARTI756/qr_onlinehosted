@@ -9,7 +9,16 @@ import qrcode
 import os
 from datetime import datetime, timedelta
 from pytz import timezone
+from ultralytics import YOLO
 
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        model = YOLO("model/best.pt")
+        model.fuse()
+    return model
 # ----------------------------
 # APP CONFIG
 # ----------------------------
@@ -275,27 +284,34 @@ def scan_upload():
     filepath = os.path.join("static", filename)
     file.save(filepath)
 
+    # ✅ YOLO DETECTION
+    model = get_model()
+    results = model(filepath, imgsz=320, conf=0.25)
+
+    if not results or len(results[0].boxes) == 0:
+        os.remove(filepath)
+        return "No QR detected"
+
+    box = results[0].boxes.xyxy[0].cpu().numpy()
+    x1, y1, x2, y2 = map(int, box)
+
     image = cv2.imread(filepath)
+    qr_crop = image[y1:y2, x1:x2]
 
-    if image is None:
-        return "Invalid image"
-
-    # 📷 Step 1: Grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # 📷 Step 2: Noise reduction
-    blurred = cv2.GaussianBlur(gray, (5,5), 0)
-
-    # 🔍 Step 3: Detect QR
     detector = cv2.QRCodeDetector()
-    data, bbox, _ = detector.detectAndDecode(blurred)
+    data, _, _ = detector.detectAndDecode(qr_crop)
+
+    os.remove(filepath)
+
+    import gc
+    gc.collect()
 
     if data:
-        os.remove(filepath)  # ✅ delete file after processing
         return redirect(f"/scan_result?data={data}")
     else:
-        os.remove(filepath)  # ✅ delete file even if failed
-        return "No QR detected"
+        return "QR detected but could not decode"
+
+
 
 
 from urllib.parse import urlparse

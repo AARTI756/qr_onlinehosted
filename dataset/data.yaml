@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['QR_CODE']
+
+roboflow:
+  workspace: aartis-workspace-tzjpr
+  project: qr-code-oerhe-u75zz-zqqyi
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/aartis-workspace-tzjpr/qr-code-oerhe-u75zz-zqqyi/dataset/2

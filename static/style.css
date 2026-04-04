@@ -9,7 +9,7 @@ body {
 }
 
 h1, h2, h3, h5 {
-    color: #063680;
+    color: #010d20;
 }
 
 /* ---------------- NAVBAR ---------------- */
@@ -39,7 +39,7 @@ h1, h2, h3, h5 {
 
 /* ---------------- HERO SECTION ---------------- */
 .hero-section {
-    background: linear-gradient(135deg, #272f3fc5, #4e9af1);
+    background: linear-gradient(135deg, #3a77f3c5, #7ab6fa);
     border-radius: 20px;
     padding: 60px 20px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
@@ -82,7 +82,7 @@ h1, h2, h3, h5 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #4e9af1, #1b60d2);
+    background: linear-gradient(135deg, #344b65, #1b60d2);
     border: none;
     transition: all 0.3s ease;
 }
