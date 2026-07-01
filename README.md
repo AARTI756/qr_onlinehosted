@@ -1,25 +1,25 @@
-# 🚀 Smart QR Intelligence
+# Smart QR Intelligence
 
 **Machine Vision-Based Secure QR Generator & Scanner Web Application**
 
 ---
 
-## 📌 Overview
+## Overview
 
 Smart QR Intelligence is a feature-rich QR-based web application that enables users to **generate, scan, and analyze QR codes** with enhanced security and intelligent detection features.
 
 This project integrates concepts from:
 
-* 🧠 Machine Vision
-* 🌐 Web Development
-* 🔒 Security Systems
-* 🤖 Rule-based Intelligent Logic
+* Machine Vision
+* Web Development
+* Security Systems
+* Rule-based Intelligent Logic
 
 ---
 
-## ✨ Features
+##  Features
 
-### 🔐 QR Generation
+###  QR Generation
 
 * Generate QR codes for text, URLs, or emails
 * Set **expiry time** for QR codes
@@ -28,7 +28,7 @@ This project integrates concepts from:
 
 ---
 
-### 📷 QR Scanning
+###  QR Scanning
 
 * Scan QR using **live camera (browser-based using html5-qrcode)**
 * Upload image to scan QR (**OpenCV with preprocessing**)
@@ -36,7 +36,7 @@ This project integrates concepts from:
 
 ---
 
-### 🧠 Smart Detection (Rule-Based AI Logic)
+###  Smart Detection (Rule-Based AI Logic)
 
 * Automatically classifies QR content using pattern matching:
 
@@ -61,13 +61,13 @@ This project integrates concepts from:
 
 ---
 
-### 🧠 Machine Vision Concepts Used
+###  Machine Vision Concepts Used
 
 This project incorporates fundamental image processing techniques:
 
-* 📷 **Grayscale Conversion** – simplifies the image for better detection
-* 🧹 **Noise Reduction** – improves clarity using Gaussian Blur
-* 🔍 **QR Pattern Detection:**
+*  **Grayscale Conversion** – simplifies the image for better detection
+*  **Noise Reduction** – improves clarity using Gaussian Blur
+*  **QR Pattern Detection:**
 
   * Finder Patterns (corner squares)
   * Alignment Pattern (distortion correction)
@@ -76,7 +76,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-### 🌍 Scan Tracking & Analytics
+###  Scan Tracking & Analytics
 
 * Tracks:
 
@@ -88,14 +88,14 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-### 🔄 Smart Actions
+###  Smart Actions
 
 * Auto **redirect if QR contains URL**
 * Display dynamic actions based on QR content
 
 ---
 
-### 👤 User System
+###  User System
 
 * User Registration & Login
 * Personal QR history
@@ -103,7 +103,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-## ⚙️ How It Works
+##  How It Works
 
 1. User generates a QR code with optional security settings
 2. QR stores a secure **token-based URL**
@@ -119,7 +119,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 ### Backend
 
@@ -148,7 +148,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-## 🧩 System Architecture
+##  System Architecture
 
 1. User generates QR → Stored in database
 2. QR contains a secure token-based URL
@@ -163,7 +163,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-## 🔒 Security Features
+##  Security Features
 
 * Token-based QR validation
 * Expiry-based access control
@@ -174,7 +174,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-## 📊 Future Enhancements
+##  Future Enhancements
 
 * 📈 Scan analytics dashboard (graphs & insights)
 * 🤖 ML-based classification model
@@ -183,7 +183,7 @@ These techniques enhance QR detection accuracy in real-world conditions.
 
 ---
 
-## 🚀 Deployment
+##  Deployment
 
 Deployed on:
 
@@ -193,7 +193,7 @@ Deployed on:
 
 ---
 
-## 💻 Run Locally
+##  Run Locally
 
 ```bash
 git clone https://github.com/AARTI756/qr_onlinehosted
@@ -206,7 +206,7 @@ python app.py
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Aarti Sakpal**
 
@@ -218,7 +218,7 @@ This project is for academic and learning purposes.
 
 ---
 
-## ⭐ Project Highlights
+##  Project Highlights
 
 ✔ Secure QR system
 ✔ Machine Vision integration
